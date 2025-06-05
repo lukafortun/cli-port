@@ -24,7 +24,7 @@ draw_box_content(){
 	local rows=$2
 	local cols=$3
 	local cut_width=$(percent_of total_width 75)
-        local box_height=40
+        local box_height=$(( rows <  40 ? (rows - 2) : 40 ))
         local box_width=$cut_width
         local start_row=$(( (rows - box_height) / 2 ))
         local start_col=$(( (cols - total_width) / 2 ))
