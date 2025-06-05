@@ -4,6 +4,7 @@ source "$BASE_DIR/core/ui.sh"
 source "$BASE_DIR/core/input.sh"
 source "$BASE_DIR/core/config.sh"
 source "$BASE_DIR/fold.sh"
+source "$BASE_DIR/core/stylise.sh"
 
 STATE=0
 resize_needed=1
