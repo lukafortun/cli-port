@@ -1,0 +1,31 @@
+name: Flatten and Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  flatten_release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Required to create a release
+
+    steps:
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v3
+
+      - name: 🛠 Make flatten.sh executable
+        run: chmod +x flatten.sh
+
+      - name: 🧩 Generate standalone script
+        run: ./flatten.sh -i entrypoint.sh -o standalone.sh
+
+      - name: 🚀 Create GitHub release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v-latest
+          name: "Latest Flattened Script"
+          body: "This release contains the latest version of the flattened standalone.sh script."
+          files: standalone.sh
