@@ -71,11 +71,11 @@ get_index_content(){
     echo -e "\x1b[31m█ █▄░█ █▀▄ █▀▀ ▀▄▀
 \x1b[31m█ █░▀█ █▄▀ ██▄ █░█\n"
     case "$page" in
-      0) echo -e "\e[1m  0 - Home\e[0m\n  1 - About me\n  2 - Projects\n  3 - Skills\n  4 - Contact";;
-      1) echo -e "  0 - Home\n\e[1m  1 - About me\e[0m\n  2 - Projects\n  3 - Skills\n  4 - Contact";;
-      2) echo -e "  0 - Home\n  1 - About me\n\e[1m  2 - Projects\e[0m\n  3 - Skills\n  4 - Contact";;
-      3) echo -e "  0 - Home\n  1 - About me\n  2 - Projects\n\e[1m  3 - Skills\e[0m\n  4 - Contact";;
-      4) echo -e "  0 - Home\n  1 - About me\n  2 - Projects\n  3 - Skills\n\e[1m  4 - Contact\e[0m";;
+      0) echo -e "\x1b[4;1m  0 - Home\e[0m\n  1 - About me\n  2 - Projects\n  3 - Skills\n  4 - Contact";;
+      1) echo -e "  0 - Home\n\x1b[4;1m  1 - About me\e[0m\n  2 - Projects\n  3 - Skills\n  4 - Contact";;
+      2) echo -e "  0 - Home\n  1 - About me\n\x1b[4;1m  2 - Projects\e[0m\n  3 - Skills\n  4 - Contact";;
+      3) echo -e "  0 - Home\n  1 - About me\n  2 - Projects\n\x1b[4;1m  3 - Skills\e[0m\n  4 - Contact";;
+      4) echo -e "  0 - Home\n  1 - About me\n  2 - Projects\n  3 - Skills\n\x1b[4;1m  4 - Contact\e[0m";;
     esac
 }
 content=$(landing_page_content);
