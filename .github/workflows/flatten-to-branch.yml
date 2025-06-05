@@ -1,0 +1,35 @@
+name: Flatten and Commit to Branch
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  flatten_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🛠 Make flatten.sh executable
+        run: chmod +x flatten.sh
+
+      - name: 🧩 Run flatten.sh
+        run: ./flatten.sh -i entrypoint.sh -o standalone.sh
+
+      - name: 📦 Create flattened branch with standalone.sh
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          # Clone a separate branch (orphan if needed)
+          git fetch origin
+          git switch --force-create flattened
+
+          # Clean branch and move file
+          find . -not -name standalone.sh -not -name .git -exec rm -rf {} +
+          git add standalone.sh
+          git commit -m "Update flattened script"
+          git push --force origin flattened
