@@ -86,19 +86,41 @@ while true; do
     [[ "$resize_needed" -eq 1 ]] && {
         rows=$(tput lines)
         cols=$(tput cols)
-  	clear
-    total_width=$(( cols <   150 ? cols : 150 ))
-	  draw_box_content $total_width $rows $cols
+        clear
+        total_width=$(( cols < 150 ? cols : 150 ))
+        draw_box_content $total_width $rows $cols
         resize_needed=0
     }
 
     key=$(get_key)
     case "$key" in
-        0) content=$(landing_page_content); page=0;resize_needed=1;;
-        1) content=$(about_page_content); page=1;resize_needed=1;;
-        2) content=$(projects_page_content); page=2;resize_needed=1;;
-        3) content=$(skills_page_content); page=3;resize_needed=1;;
-        4) content=$(contact_page_content); page=4;resize_needed=1;;
+        0) page=0; content=$(landing_page_content); resize_needed=1;;
+        1) page=1; content=$(about_page_content); resize_needed=1;;
+        2) page=2; content=$(projects_page_content); resize_needed=1;;
+        3) page=3; content=$(skills_page_content); resize_needed=1;;
+        4) page=4; content=$(contact_page_content); resize_needed=1;;
+        $'\e[B') # Flèche bas
+            page=$(( (page + 1) % 5 ))
+            case "$page" in
+                0) content=$(landing_page_content);;
+                1) content=$(about_page_content);;
+                2) content=$(projects_page_content);;
+                3) content=$(skills_page_content);;
+                4) content=$(contact_page_content);;
+            esac
+            resize_needed=1
+            ;;
+        $'\e[A') # Flèche haut
+            page=$(( (page + 4) % 5 ))
+            case "$page" in
+                0) content=$(landing_page_content);;
+                1) content=$(about_page_content);;
+                2) content=$(projects_page_content);;
+                3) content=$(skills_page_content);;
+                4) content=$(contact_page_content);;
+            esac
+            resize_needed=1
+            ;;
         q|Q) clear; exit 0;;
     esac
 done
