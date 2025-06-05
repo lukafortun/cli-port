@@ -78,6 +78,17 @@ get_index_content(){
       4) echo -e "  0 - Home\n  1 - About me\n  2 - Projects\n  3 - Skills\n\x1b[31;4;1m  4 - Contact\e[0m";;
     esac
 }
+
+get_page_content() {
+    case "$1" in
+        0) landing_page_content;;
+        1) about_page_content;;
+        2) projects_page_content;;
+        3) skills_page_content;;
+        4) contact_page_content;;
+        *) landing_page_content;;
+    esac
+}
 content=$(landing_page_content);
 
 trap on_resize SIGWINCH
@@ -94,34 +105,24 @@ while true; do
 
     key=$(get_key)
     case "$key" in
-        0) page=0; content=$(landing_page_content); resize_needed=1;;
-        1) page=1; content=$(about_page_content); resize_needed=1;;
-        2) page=2; content=$(projects_page_content); resize_needed=1;;
-        3) page=3; content=$(skills_page_content); resize_needed=1;;
-        4) page=4; content=$(contact_page_content); resize_needed=1;;
+        [0-4])
+            page=$key
+            content=$(get_page_content "$page")
+            resize_needed=1
+            ;;
         $'\e[B') # Flèche bas
             page=$(( (page + 1) % 5 ))
-            case "$page" in
-                0) content=$(landing_page_content);;
-                1) content=$(about_page_content);;
-                2) content=$(projects_page_content);;
-                3) content=$(skills_page_content);;
-                4) content=$(contact_page_content);;
-            esac
+            content=$(get_page_content "$page")
             resize_needed=1
             ;;
         $'\e[A') # Flèche haut
             page=$(( (page + 4) % 5 ))
-            case "$page" in
-                0) content=$(landing_page_content);;
-                1) content=$(about_page_content);;
-                2) content=$(projects_page_content);;
-                3) content=$(skills_page_content);;
-                4) content=$(contact_page_content);;
-            esac
+            content=$(get_page_content "$page")
             resize_needed=1
             ;;
-        q|Q) clear; exit 0;;
+        q|Q)
+            clear; exit 0
+            ;;
     esac
 done
 
