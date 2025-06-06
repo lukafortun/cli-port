@@ -55,18 +55,15 @@ draw_box() {
 # END /home/user/cli-port/core/ui.sh
 # BEGIN /home/user/cli-port/core/input.sh
 get_key() {
-  stty -echo -icanon time 0 min 1
-  local key
-  IFS= read -rsn1 -t 0.1 key
-  stty sane
+  IFS= read -rsn1 key
+  if [[ $key == $'\e' ]]; then
+    IFS= read -rsn2 rest
+    key+="$rest"
+  fi
   echo "$key"
 }
-
 # END /home/user/cli-port/core/input.sh
 # BEGIN /home/user/cli-port/core/config.sh
-AUTHOR_NAME="John Doe"
-EMAIL="john.doe@example.com"
-
 # END /home/user/cli-port/core/config.sh
 # BEGIN /home/user/cli-port/fold.sh
 #!/bin/bash
@@ -186,6 +183,67 @@ split_ansi_lines() {
 
 
 # END /home/user/cli-port/fold.sh
+# BEGIN /home/user/cli-port/core/stylise.sh
+stylise() {
+    local text="$1"
+    local color="$2"
+    local -A top bottom
+
+
+# ▄▀█ █▄▄ █▀▀ █▀▄ █▀▀ █▀▀ █▀▀ █░█ █ ░░█ █▄▀ █░░ █▀▄▀█ █▄░█ █▀█ █▀█ █▀█ █▀█ █▀ ▀█▀ █░█ █░█ █░█░█ ▀▄▀ █▄█ ▀█
+# █▀█ █▄█ █▄▄ █▄▀ ██▄ █▀░ █▄█ █▀█ █ █▄█ █░█ █▄▄ █░▀░█ █░▀█ █▄█ █▀▀ ▀▀█ █▀▄ ▄█ ░█░ █▄█ ▀▄▀ ▀▄▀▄▀ █░█ ░█░ █▄
+
+    top=(
+        ["A"]="▄▀█" ["B"]="█▄▄" ["C"]="█▀▀" ["D"]="█▀▄" ["E"]="█▀▀" ["F"]="█▀▀" ["G"]="█▀▀" ["H"]="█░█" ["I"]="█" ["J"]="░░█" ["K"]="█▄▀" ["L"]="█░░"
+        ["M"]="█▀▄▀█" ["N"]="█▄░█" ["O"]="█▀█" ["P"]="█▀█" ["Q"]="█▀█" ["R"]="█▀█" ["S"]="█▀" ["T"]="▀█▀" ["U"]="█░█" ["V"]="█░█"
+        ["W"]="█░█░█" ["X"]="▀▄▀" ["Y"]="█▄█" ["Z"]="▀█"
+    )
+    bottom=(
+        ["A"]="█▀█" ["B"]="█▄█" ["C"]="█▄▄" ["D"]="█▄▀" ["E"]="██▄" ["F"]="█▀░" ["G"]="█▄█" ["H"]="█▀█" ["I"]="█" ["J"]="█▄█" ["K"]="█░█" ["L"]="█▄▄"
+        ["M"]="█░▀░█" ["N"]="█░▀█" ["O"]="█▄█" ["P"]="█▀▀" ["Q"]="▀▀█" ["R"]="█▀▄" ["S"]="▄█" ["T"]="░█░" ["U"]="█▄█" ["V"]="▀▄▀"
+        ["W"]="▀▄▀▄▀" ["X"]="█░█" ["Y"]="░█░" ["Z"]="█▄"
+    )
+
+    local line1="$color"
+    local line2="$color"
+
+
+    for (( i=0; i<${#text}; i++ )); do
+        char="${text:$i:1}"
+        char=$(echo "$char" | tr '[:lower:]' '[:upper:]')
+        line1+="${top[$char]:-  } "
+        line2+="${bottom[$char]:-  } "
+    done
+
+    echo -e "$line1"
+    echo -e "$line2"
+}
+
+
+# END /home/user/cli-port/core/stylise.sh
+# BEGIN /home/user/cli-port/pages.sh
+PAGE_TITLES=()
+PAGE_CONTENTS=()
+
+# BEGIN /home/user/cli-port/pages/_flat_pages.sh
+PAGE_TITLES=()
+PAGE_CONTENTS=()
+PAGE_TITLES+=(Home)
+PAGE_CONTENTS+=(Bienvenue\ sur\ la\ page\ d\'accueil\ \!)
+PAGE_TITLES+=(About\ me)
+PAGE_CONTENTS+=(À\ propos\ de\ moi.)
+PAGE_TITLES+=(Projects)
+PAGE_CONTENTS+=($'🏠 HomeServer Ecosystem\nA multi-node home server running custom self-hosted apps.\n• Used: Spring Boot, ReactJS, Flask, Docker Swarm\n• Features: NAT bypassing, secure auth (OIDC + LDAP), container orchestration\n\n📦 AS24 Internship (2024)\nBuilt document management APIs with Java + Spring Boot.\n• Migrated millions of documents\n• Integrated with Microsoft tools: SharePoint, AD, Graph SDK\n\n🧠 3D Scanner Project\nContributed to an open-source 3D scanning app using Vulkan in C++.')
+# END /home/user/cli-port/pages/_flat_pages.sh
+
+# for pagefile in "$BASE_DIR/pages/"*.sh; do
+#   unset PAGE_TITLE PAGE_CONTENT
+#   source "$pagefile"
+#   PAGE_TITLES+=("$PAGE_TITLE")
+#   PAGE_CONTENTS+=("$PAGE_CONTENT")
+# done
+
+# END /home/user/cli-port/pages.sh
 
 STATE=0
 resize_needed=1
@@ -206,7 +264,7 @@ draw_box_content(){
 	local rows=$2
 	local cols=$3
 	local cut_width=$(percent_of total_width 75)
-        local box_height=40
+        local box_height=$(( rows <  40 ? (rows - 2) : 40 ))
         local box_width=$cut_width
         local start_row=$(( (rows - box_height) / 2 ))
         local start_col=$(( (cols - total_width) / 2 ))
@@ -216,72 +274,57 @@ index_content=$(get_index_content)
 draw_box $start_row $((start_col + box_width)) $((total_width - box_width)) $box_height "$index_content"
 }
 
-landing_page_content() {  
-  echo -e "\x1b[34m█░█ █▀█ █▀▄▀█ █▀▀
-\x1b[34m█▀█ █▄█ █░▀░█ ██▄\n
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit.";}
-
-about_page_content()    { 
-  echo -e "\x1b[34m▄▀█ █▄▄ █▀█ █░█ ▀█▀   █▀▄▀█ █▀▀
-\x1b[34m█▀█ █▄█ █▄█ █▄█ ░█░   █░▀░█ ██▄\n
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit.";}
-
-projects_page_content() { echo -e "\x1b[34m█▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀ █▀
-\x1b[34m█▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░ ▄█\n
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit."; }
-
-skills_page_content()   { echo -e "\x1b[34m█▀ █▄▀ █ █░░ █░░ █▀
-\x1b[34m▄█ █░█ █ █▄▄ █▄▄ ▄█\n
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit."; }
-
-contact_page_content()  { echo -e "\x1b[34m█▀▀ █▀█ █▄░█ ▀█▀ ▄▀█ █▀▀ ▀█▀
-\x1b[34m█▄▄ █▄█ █░▀█ ░█░ █▀█ █▄▄ ░█░\n
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit."; }
-
-
-get_index_content(){
-    echo -e "\x1b[31m█ █▄░█ █▀▄ █▀▀ ▀▄▀
-\x1b[31m█ █░▀█ █▄▀ ██▄ █░█\n"
-    case "$page" in
-      0) echo -e "\e[1m  0 - Home\e[0m\n  1 - About me\n  2 - Projects\n  3 - Skills\n  4 - Contact";;
-      1) echo -e "  0 - Home\n\e[1m  1 - About me\e[0m\n  2 - Projects\n  3 - Skills\n  4 - Contact";;
-      2) echo -e "  0 - Home\n  1 - About me\n\e[1m  2 - Projects\e[0m\n  3 - Skills\n  4 - Contact";;
-      3) echo -e "  0 - Home\n  1 - About me\n  2 - Projects\n\e[1m  3 - Skills\e[0m\n  4 - Contact";;
-      4) echo -e "  0 - Home\n  1 - About me\n  2 - Projects\n  3 - Skills\n\e[1m  4 - Contact\e[0m";;
-    esac
+get_index_content() {
+  echo -e "$(stylise "index" "\x1b[31m")\n"
+  for i in "${!PAGE_TITLES[@]}"; do
+    if [[ $i -eq $page ]]; then
+      echo -e "\x1b[31;4;1m  $(($i+1)) - ${PAGE_TITLES[$i]}\e[0m"
+    else
+      echo -e "  $(($i+1)) - ${PAGE_TITLES[$i]}"
+    fi
+  done
 }
-content=$(landing_page_content);
+
+get_page_content() {
+  local idx=$(( $1 - 1 ))
+  local title="${PAGE_TITLES[$idx]}"
+  local content="${PAGE_CONTENTS[$idx]}"
+  echo -e "$(stylise "$title" "\x1b[34m")\n\n$content"
+}
+
+content=$(get_page_content 1);
 
 trap on_resize SIGWINCH
-echo ">> Redimensionne ta fenêtre…"
 while true; do
     [[ "$resize_needed" -eq 1 ]] && {
         rows=$(tput lines)
         cols=$(tput cols)
-  	clear
-    total_width=$(( cols <   150 ? cols : 150 ))
-	  draw_box_content $total_width $rows $cols
+        clear
+        total_width=$(( cols < 150 ? cols : 150 ))
+        draw_box_content $total_width $rows $cols
         resize_needed=0
     }
 
     key=$(get_key)
     case "$key" in
-        0) content=$(landing_page_content); page=0;resize_needed=1;;
-        1) content=$(about_page_content); page=1;resize_needed=1;;
-        2) content=$(projects_page_content); page=2;resize_needed=1;;
-        3) content=$(skills_page_content); page=3;resize_needed=1;;
-        4) content=$(contact_page_content); page=4;resize_needed=1;;
-        q|Q) clear; exit 0;;
+        [1-${#PAGE_TITLES[@]}]) 
+            page=$((key - 1)) 
+            content=$(get_page_content "$((page + 1))")
+            resize_needed=1
+            ;;
+        $'\e[B') 
+            page=$(( (page + 1) % ${#PAGE_TITLES[@]} ))
+            content=$(get_page_content "$((page + 1))")
+            resize_needed=1
+            ;;
+        $'\e[A') 
+            page=$(( (page + ${#PAGE_TITLES[@]} - 1) % ${#PAGE_TITLES[@]} ))
+            content=$(get_page_content "$((page + 1))")
+            resize_needed=1
+            ;;
+        q|Q)
+            clear; exit 0
+            ;;
     esac
 done
 

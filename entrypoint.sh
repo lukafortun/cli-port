@@ -5,6 +5,7 @@ source "$BASE_DIR/core/input.sh"
 source "$BASE_DIR/core/config.sh"
 source "$BASE_DIR/fold.sh"
 source "$BASE_DIR/core/stylise.sh"
+source "$BASE_DIR/pages.sh"
 
 STATE=0
 resize_needed=1
@@ -35,63 +36,27 @@ index_content=$(get_index_content)
 draw_box $start_row $((start_col + box_width)) $((total_width - box_width)) $box_height "$index_content"
 }
 
-landing_page_content() {  
-  echo -e "$(stylise "home" "\x1b[34m")"
-  echo -e "\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit.";}
-
-about_page_content()    { 
-  echo -e "$(stylise "about me" "\x1b[34m")"
-  echo -e "\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit.";}
-
-projects_page_content() { 
-    echo -e "$(stylise "projects" "\x1b[34m")"
-  echo -e "\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit.";}
-
-skills_page_content()   { 
-    echo -e "$(stylise "skills" "\x1b[34m")"
-  echo -e "\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit.";}
-
-contact_page_content()  { 
-    echo -e "$(stylise "contact" "\x1b[34m")"
-  echo -e "\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sit amet elit faucibus, aliquam elit ac, facilisis justo. Vivamus ac ornare eros, tincidunt facilisis tellus. Pellentesque rutrum ante eu eros viverra malesuada. Etiam nec lacus non lacus pulvinar venenatis. Vestibulum porttitor fringilla nisi, faucibus lacinia erat laoreet non. Sed elementum, enim eget euismod feugiat, libero lectus porta nisi, in dignissim nibh odio non eros. Etiam sodales fermentum metus sit amet pellentesque. Nam feugiat elementum varius. Quisque ultrices eleifend mollis. Nunc venenatis ornare purus in scelerisque. Donec eu lacus id felis hendrerit posuere. Donec condimentum malesuada mauris. Ut sed luctus purus. Suspendisse lobortis lacinia ex.
-
-Ut vestibulum nulla et urna pharetra, quis commodo odio pharetra. Nulla lobortis nibh nibh, non dapibus arcu pulvinar ut. Donec porttitor ligula ac nisl porta, id consectetur eros efficitur. Donec erat nunc, rutrum eget metus eget, gravida viverra erat. Pellentesque augue ex, auctor sed pretium et, viverra vitae massa. Curabitur fermentum odio turpis. Nam scelerisque pretium velit non facilisis. Suspendisse tempus molestie dolor sed aliquam. Praesent placerat, nisi vitae viverra accumsan, magna nibh commodo odio, nec facilisis lorem nisl a velit.";}
-
-
-get_index_content(){
-    echo -e "$(stylise "index" "\x1b[31m")"
-    echo -e "\n"
-    case "$page" in
-      0) echo -e "\x1b[31;4;1m  0 - Home\e[0m\n  1 - About me\n  2 - Projects\n  3 - Skills\n  4 - Contact";;
-      1) echo -e "  0 - Home\n\x1b[31;4;1m  1 - About me\e[0m\n  2 - Projects\n  3 - Skills\n  4 - Contact";;
-      2) echo -e "  0 - Home\n  1 - About me\n\x1b[31;4;1m  2 - Projects\e[0m\n  3 - Skills\n  4 - Contact";;
-      3) echo -e "  0 - Home\n  1 - About me\n  2 - Projects\n\x1b[31;4;1m  3 - Skills\e[0m\n  4 - Contact";;
-      4) echo -e "  0 - Home\n  1 - About me\n  2 - Projects\n  3 - Skills\n\x1b[31;4;1m  4 - Contact\e[0m";;
-    esac
+get_index_content() {
+  echo -e "$(stylise "index" "\x1b[31m")\n"
+  for i in "${!PAGE_TITLES[@]}"; do
+    if [[ $i -eq $page ]]; then
+      echo -e "\x1b[31;4;1m  $(($i+1)) - ${PAGE_TITLES[$i]}\e[0m"
+    else
+      echo -e "  $(($i+1)) - ${PAGE_TITLES[$i]}"
+    fi
+  done
 }
 
 get_page_content() {
-    case "$1" in
-        0) landing_page_content;;
-        1) about_page_content;;
-        2) projects_page_content;;
-        3) skills_page_content;;
-        4) contact_page_content;;
-        *) landing_page_content;;
-    esac
+  local idx=$(( $1 - 1 ))
+  local title="${PAGE_TITLES[$idx]}"
+  local content="${PAGE_CONTENTS[$idx]}"
+  echo -e "$(stylise "$title" "\x1b[34m")\n\n$content"
 }
-content=$(landing_page_content);
+
+content=$(get_page_content 1);
 
 trap on_resize SIGWINCH
-echo ">> Redimensionne ta fenêtre…"
 while true; do
     [[ "$resize_needed" -eq 1 ]] && {
         rows=$(tput lines)
@@ -104,19 +69,19 @@ while true; do
 
     key=$(get_key)
     case "$key" in
-        [0-4])
-            page=$key
-            content=$(get_page_content "$page")
+        [1-${#PAGE_TITLES[@]}]) 
+            page=$((key - 1)) 
+            content=$(get_page_content "$((page + 1))")
             resize_needed=1
             ;;
-        $'\e[B') # Flèche bas
-            page=$(( (page + 1) % 5 ))
-            content=$(get_page_content "$page")
+        $'\e[B') 
+            page=$(( (page + 1) % ${#PAGE_TITLES[@]} ))
+            content=$(get_page_content "$((page + 1))")
             resize_needed=1
             ;;
-        $'\e[A') # Flèche haut
-            page=$(( (page + 4) % 5 ))
-            content=$(get_page_content "$page")
+        $'\e[A') 
+            page=$(( (page + ${#PAGE_TITLES[@]} - 1) % ${#PAGE_TITLES[@]} ))
+            content=$(get_page_content "$((page + 1))")
             resize_needed=1
             ;;
         q|Q)

@@ -51,8 +51,30 @@ inline_sources() {
   mv "$temp_file" "$file"
 }
 
+generate_pages_arrays() {
+  local pages_dir="$BASE_DIR/pages"
+  echo "PAGE_TITLES=()" > "$pages_dir/_flat_pages.sh"
+  echo "PAGE_CONTENTS=()" >> "$pages_dir/_flat_pages.sh"
+  for pagefile in "$pages_dir"/*.sh; do
+    unset PAGE_TITLE PAGE_CONTENT
+    source "$pagefile"
+    if [[ -n "$PAGE_TITLE" && -n "$PAGE_CONTENT" ]]; then
+      esc_title=$(printf '%q' "$PAGE_TITLE")
+      esc_content=$(printf '%q' "$PAGE_CONTENT")
+      echo "PAGE_TITLES+=($esc_title)" >> "$pages_dir/_flat_pages.sh"
+      echo "PAGE_CONTENTS+=($esc_content)" >> "$pages_dir/_flat_pages.sh"
+    fi
+  done
+}
+
+generate_pages_arrays
+
+sed -i '/^for pagefile in.*; do/,/^done$/c\source "$BASE_DIR/pages/_flat_pages.sh"' "$BASE_DIR/pages.sh"
+
 while grep -q 'source "\$BASE_DIR/' "$OUTPUT_FILE"; do
   inline_sources "$OUTPUT_FILE"
 done
 
 echo "Files merged : $OUTPUT_FILE"
+
+rm -f "$BASE_DIR/pages/_flat_pages.sh"
