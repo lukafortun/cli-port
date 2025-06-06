@@ -57,6 +57,7 @@ get_page_content() {
 content=$(get_page_content 1);
 
 trap on_resize SIGWINCH
+
 while true; do
     [[ "$resize_needed" -eq 1 ]] && {
         rows=$(tput lines)
@@ -67,26 +68,27 @@ while true; do
         resize_needed=0
     }
 
-    key=$(get_key)
-    case "$key" in
-        [1-${#PAGE_TITLES[@]}]) 
-            page=$((key - 1)) 
-            content=$(get_page_content "$((page + 1))")
-            resize_needed=1
-            ;;
-        $'\e[B') 
-            page=$(( (page + 1) % ${#PAGE_TITLES[@]} ))
-            content=$(get_page_content "$((page + 1))")
-            resize_needed=1
-            ;;
-        $'\e[A') 
-            page=$(( (page + ${#PAGE_TITLES[@]} - 1) % ${#PAGE_TITLES[@]} ))
-            content=$(get_page_content "$((page + 1))")
-            resize_needed=1
-            ;;
-        q|Q)
-            clear; exit 0
-            ;;
-    esac
+    if read -rsn1 -t 0.2 key; then
+        case "$key" in
+            [1-${#PAGE_TITLES[@]}])
+                page=$((key - 1))
+                content=$(get_page_content "$((page + 1))")
+                resize_needed=1
+                ;;
+            $'\e[B')
+                page=$(( (page + 1) % ${#PAGE_TITLES[@]} ))
+                content=$(get_page_content "$((page + 1))")
+                resize_needed=1
+                ;;
+            $'\e[A')
+                page=$(( (page + ${#PAGE_TITLES[@]} - 1) % ${#PAGE_TITLES[@]} ))
+                content=$(get_page_content "$((page + 1))")
+                resize_needed=1
+                ;;
+            q|Q)
+                clear; exit 0
+                ;;
+        esac
+    fi
 done
 
