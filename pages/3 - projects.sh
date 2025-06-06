@@ -1,3 +1,3 @@
 PAGE_TITLE="Projects"
 
-PAGE_CONTENT="test"
+PAGE_CONTENT="place holder for projects"
