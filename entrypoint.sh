@@ -69,6 +69,10 @@ while true; do
     }
 
     if read -rsn1 -t 0.2 key; then
+        if [[ $key == $'\e' ]]; then
+            read -rsn2 -t 0.01 rest
+            key+="$rest"
+        fi
         case "$key" in
             [1-${#PAGE_TITLES[@]}])
                 page=$((key - 1))
